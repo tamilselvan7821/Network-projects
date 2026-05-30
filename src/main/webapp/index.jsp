@@ -1,0 +1,1728 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Projects Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #222;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ─── SIDEBAR ─── */
+        #sidebar {
+            width: 240px;
+            background: #1e1e2e;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #sidebar-brand {
+            padding: 18px 16px 12px;
+            border-bottom: 1px solid #2e2e45;
+        }
+
+        #sidebar-brand h2 {
+            color: #c9d1d9;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        #sidebar-brand p {
+            color: #6e7681;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        #search-wrap { padding: 10px 10px 4px; }
+
+        #nav-search {
+            width: 100%;
+            padding: 7px 10px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            background: #161622;
+            color: #c9d1d9;
+            font-size: 12px;
+            outline: none;
+        }
+
+        #nav-search::placeholder { color: #484f58; }
+        #nav-search:focus { border-color: #6e76e5; }
+
+        #nav-list {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+            padding: 6px 8px;
+        }
+
+        #nav-list::-webkit-scrollbar { width: 4px; }
+        #nav-list::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+
+        #nav-list li {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #8b949e;
+            transition: background 0.15s, color 0.15s;
+            margin-bottom: 1px;
+        }
+
+        #nav-list li:hover { background: #2a2a3e; color: #c9d1d9; }
+
+        #nav-list li.active {
+            background: #2d2d52;
+            color: #7c83f5;
+            font-weight: 600;
+        }
+
+        #nav-list li .ni { font-size: 15px; }
+
+        /* ─── MAIN ─── */
+        #main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 32px;
+            background: #f0f2f5;
+        }
+
+        #main::-webkit-scrollbar { width: 6px; }
+        #main::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ─── HOME GRID ─── */
+        .home-header { margin-bottom: 22px; }
+        .home-header h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+        .home-header p { font-size: 13px; color: #666; margin-top: 4px; }
+
+        #home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 14px;
+        }
+
+        .tile {
+            background: #fff;
+            border: 1px solid #e4e8ee;
+            border-radius: 14px;
+            padding: 18px 16px;
+            cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+        }
+
+        .tile:hover {
+            border-color: #6e76e5;
+            box-shadow: 0 6px 20px rgba(110,118,229,0.15);
+            transform: translateY(-2px);
+        }
+
+        .tile .t-icon { font-size: 22px; margin-bottom: 8px; }
+        .tile .t-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+        .tile .t-ep {
+            font-size: 11px;
+            color: #888;
+            font-family: 'Courier New', monospace;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        /* ─── CARDS ─── */
+        .pcard {
+            background: #fff;
+            border: 1px solid #e4e8ee;
+            border-radius: 16px;
+            padding: 26px 28px;
+            margin-bottom: 20px;
+            max-width: 820px;
+        }
+
+        .pcard-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .pcard-header .icon-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #eef0ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .pcard-header h3 { font-size: 17px; font-weight: 700; color: #1a1a2e; }
+        .pcard-header p { font-size: 12px; color: #888; margin-top: 2px; }
+
+        .divider { height: 1px; background: #f0f2f5; margin: 20px 0; }
+
+        /* ─── FORM ELEMENTS ─── */
+        .form-section h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 12px;
+        }
+
+        .form-row { margin-bottom: 12px; }
+
+        .form-row label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 5px;
+        }
+
+        .form-row input,
+        .form-row textarea,
+        .form-row select {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 9px;
+            border: 1px solid #dde2ea;
+            background: #fafbfc;
+            font-size: 13px;
+            color: #222;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-row input:focus,
+        .form-row textarea:focus,
+        .form-row select:focus {
+            border-color: #6e76e5;
+            box-shadow: 0 0 0 3px rgba(110,118,229,0.12);
+        }
+
+        .form-row textarea { resize: vertical; min-height: 80px; }
+
+        .btn {
+            padding: 9px 22px;
+            border-radius: 9px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+            font-family: inherit;
+        }
+
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        .btn-primary { background: #6e76e5; color: #fff; }
+        .btn-primary:hover { opacity: 0.88; }
+        .btn-outline {
+            background: #fff;
+            color: #6e76e5;
+            border: 1px solid #6e76e5;
+        }
+        .btn-outline:hover { background: #f0f1ff; }
+        .btn-danger { background: #e05252; color: #fff; }
+        .btn-danger:hover { opacity: 0.88; }
+
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+        /* ─── GRID ─── */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        @media (max-width: 640px) {
+            .two-col { grid-template-columns: 1fr; }
+        }
+
+        /* ─── REQUEST BOX ─── */
+        .req-section {
+            background: #111827;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 22px;
+        }
+
+        .req-section-header {
+            background: #1f2937;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .req-section-header span {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .method-badge {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-post { background: #1d4ed8; color: #bfdbfe; }
+        .badge-ws { background: #065f46; color: #6ee7b7; }
+
+        .req-body {
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 12.5px;
+            color: #d1d5db;
+            line-height: 1.8;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .req-body .key { color: #93c5fd; }
+        .req-body .val { color: #86efac; }
+        .req-body .comment { color: #6b7280; }
+        .req-body .endpoint { color: #fde68a; font-weight: 700; }
+        .req-body .method { color: #f9a8d4; font-weight: 700; }
+
+        /* ─── RESULT BOX ─── */
+        .result-box {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12.5px;
+            color: #166534;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        /* ─── LOADING ─── */
+        .loading-bar {
+            display: none;
+            height: 3px;
+            background: linear-gradient(90deg, #6e76e5, #a78bfa, #6e76e5);
+            background-size: 200%;
+            animation: shimmer 1.2s infinite;
+            border-radius: 2px;
+            margin-top: 12px;
+        }
+
+        @keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+        /* ─── CHAT ─── */
+        #chat-users-list { list-style: none; padding: 0; }
+        #chat-users-list li {
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #444;
+            border: 1px solid #eee;
+            margin-bottom: 6px;
+            transition: all 0.15s;
+        }
+        #chat-users-list li:hover { background: #eef0ff; border-color: #6e76e5; color: #6e76e5; }
+        #chat-users-list li.selected { background: #6e76e5; color: #fff; border-color: #6e76e5; }
+
+        #chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #dde2ea;
+            border-radius: 10px;
+            padding: 12px;
+            background: #fafbfc;
+            margin-bottom: 10px;
+        }
+
+        .chat-msg {
+            padding: 8px 12px;
+            background: #6e76e5;
+            color: #fff;
+            border-radius: 10px;
+            max-width: 80%;
+            margin-bottom: 8px;
+            font-size: 13px;
+            word-wrap: break-word;
+        }
+
+        .chat-msg.received {
+            background: #f0f2f5;
+            color: #222;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <div id="sidebar">
+        <div id="sidebar-brand">
+            <h2>🌐 Network Projects</h2>
+            <p> Mini Projects Dashboard</p>
+        </div>
+        <div id="search-wrap">
+            <input id="nav-search" type="text" placeholder="🔍 Search projects..." oninput="filterNav(this.value)">
+        </div>
+        <ul id="nav-list">
+            <li class="active" data-page="home" onclick="showPage('home', this)">
+                <span class="ni">⊞</span> Overview
+            </li>
+            <li data-page="hash" onclick="showPage('hash', this)">
+                <span class="ni">🔐</span> Secure Login Simulator
+            </li>
+            <li data-page="json" onclick="showPage('json', this)">
+                <span class="ni">📄</span> JSON Validate
+            </li>
+            <li data-page="passcheck" onclick="showPage('passcheck', this)">
+                <span class="ni">💪</span> Password Strength
+            </li>
+            <li data-page="uptime" onclick="showPage('uptime', this)">
+                <span class="ni">🌐</span> Uptime Checker
+            </li>
+            <li data-page="textsim" onclick="showPage('textsim', this)">
+                <span class="ni">📊</span> Text Similarity
+            </li>
+            <li data-page="search" onclick="showPage('search', this)">
+                <span class="ni">🔍</span> Search Engine
+            </li>
+            <li data-page="log" onclick="showPage('log', this)">
+                <span class="ni">📋</span> Log Reader
+            </li>
+            <li data-page="urlmeta" onclick="showPage('urlmeta', this)">
+                <span class="ni">📈</span> URL Metadata
+            </li>
+            <li data-page="integrity" onclick="showPage('integrity', this)">
+                <span class="ni">✅</span> Verify Integrity
+            </li>
+            <li data-page="dupfind" onclick="showPage('dupfind', this)">
+                <span class="ni">📂</span> Duplicate Finder
+            </li>
+            <li data-page="blockads" onclick="showPage('blockads', this)">
+                <span class="ni">🚫</span> Block Ads
+            </li>
+            <li data-page="http" onclick="showPage('http', this)">
+                <span class="ni">🔬</span> HTTP Inspector
+            </li>
+            <li data-page="mail" onclick="showPage('mail', this)">
+                <span class="ni">📧</span> Mail Sender
+            </li>
+            <li data-page="quotes" onclick="showPage('quotes', this)">
+                <span class="ni">💬</span> Quotes API
+            </li>
+            <li data-page="bug" onclick="showPage('bug', this)">
+                <span class="ni">🐛</span> Bug Tracker
+            </li>
+            <li data-page="sql" onclick="showPage('sql', this)">
+                <span class="ni">🛡️</span> SQL Injection
+            </li>
+            <li data-page="breach" onclick="showPage('breach', this)">
+                <span class="ni">🔓</span> Breach Checker
+            </li>
+            <li data-page="resume" onclick="showPage('resume', this)">
+                <span class="ni">📄</span> Resume Scanner
+            </li>
+            <li data-page="robot" onclick="showPage('robot', this)">
+                <span class="ni">🤖</span> Robot.txt Rules
+            </li>
+            <li data-page="booking" onclick="showPage('booking', this)">
+                <span class="ni">🏠</span> Room Booking
+            </li>
+            <li data-page="chat" onclick="showPage('chat', this)">
+                <span class="ni">💬</span> Socket Chat
+            </li>
+            <li data-page="mailg" onclick="showPage('mailg', this)">
+                <span class="ni">📧</span> Mail Pattern Generator
+            </li>
+        </ul>
+    </div>
+
+    <!-- ═══════════ MAIN CONTENT ═══════════ -->
+    <div id="main">
+
+        <!-- ══ HOME ══ -->
+        <div id="page-home" class="page active">
+            <div class="home-header">
+                <h1>Java Network Mini Projects</h1>
+                <p>Click any project tile to open its dedicated panel with form inputs and backend request details.</p>
+            </div>
+            <div id="home-grid">
+                <div class="tile" onclick="nav('hash')"><div class="t-icon">🔐</div><div class="t-name">Secure Login Simulator</div><div class="t-ep">POST /hashpassword</div></div>
+                <div class="tile" onclick="nav('json')"><div class="t-icon">📄</div><div class="t-name">JSON Validate</div><div class="t-ep">POST /jsonvalidate</div></div>
+                <div class="tile" onclick="nav('passcheck')"><div class="t-icon">💪</div><div class="t-name">Password Strength</div><div class="t-ep">POST /passwordchecker</div></div>
+                <div class="tile" onclick="nav('uptime')"><div class="t-icon">🌐</div><div class="t-name">Uptime Checker</div><div class="t-ep">POST /websiteuptimechecker</div></div>
+                <div class="tile" onclick="nav('textsim')"><div class="t-icon">📊</div><div class="t-name">Text Similarity</div><div class="t-ep">POST /textsimilaritychecker</div></div>
+                <div class="tile" onclick="nav('search')"><div class="t-icon">🔍</div><div class="t-name">Search Engine</div><div class="t-ep">POST /searchengine</div></div>
+                <div class="tile" onclick="nav('log')"><div class="t-icon">📋</div><div class="t-name">Log Reader</div><div class="t-ep">POST /logreader</div></div>
+                <div class="tile" onclick="nav('urlmeta')"><div class="t-icon">📈</div><div class="t-name">URL Metadata</div><div class="t-ep">POST /urlmetadataextracter</div></div>
+                <div class="tile" onclick="nav('integrity')"><div class="t-icon">✅</div><div class="t-name">Verify Integrity</div><div class="t-ep">POST /verifyintegrity</div></div>
+                <div class="tile" onclick="nav('dupfind')"><div class="t-icon">📂</div><div class="t-name">Duplicate Finder</div><div class="t-ep">POST /duplicatefilefinder</div></div>
+                <div class="tile" onclick="nav('blockads')"><div class="t-icon">🚫</div><div class="t-name">Block Ads</div><div class="t-ep">POST /blockads</div></div>
+                <div class="tile" onclick="nav('http')"><div class="t-icon">🔬</div><div class="t-name">HTTP Inspector</div><div class="t-ep">POST /httprequestinspector</div></div>
+                <div class="tile" onclick="nav('mail')"><div class="t-icon">📧</div><div class="t-name">Mail Sender</div><div class="t-ep">POST /mail</div></div>
+                <div class="tile" onclick="nav('quotes')"><div class="t-icon">💬</div><div class="t-name">Quotes API</div><div class="t-ep">POST /quotesapi</div></div>
+                <div class="tile" onclick="nav('bug')"><div class="t-icon">🐛</div><div class="t-name">Bug Tracker</div><div class="t-ep">POST /bugtracker</div></div>
+                <div class="tile" onclick="nav('sql')"><div class="t-icon">🛡️</div><div class="t-name">SQL Injection</div><div class="t-ep">POST /sqlinjection</div></div>
+                <div class="tile" onclick="nav('breach')"><div class="t-icon">🔓</div><div class="t-name">Breach Checker</div><div class="t-ep">POST /passwordbreachcheck</div></div>
+                <div class="tile" onclick="nav('resume')"><div class="t-icon">📄</div><div class="t-name">Resume Scanner</div><div class="t-ep">POST /resumekeywordscanner</div></div>
+                <div class="tile" onclick="nav('robot')"><div class="t-icon">🤖</div><div class="t-name">Robot.txt Rules</div><div class="t-ep">POST /robottextrules</div></div>
+                <div class="tile" onclick="nav('booking')"><div class="t-icon">🏠</div><div class="t-name">Room Booking</div><div class="t-ep">POST /booking</div></div>
+                <div class="tile" onclick="nav('chat')"><div class="t-icon">💬</div><div class="t-name">Socket Chat</div><div class="t-ep">WS /chat</div></div>
+                <div class="tile" onclick="nav('mailg')"><div class="t-icon">📧</div><div class="t-name">Mail Pattern Generator</div><div class="t-ep">POST /mailgenrator</div></div>
+            </div>
+        </div>
+
+        <!-- ══ 1. Secure Login Simulator ══ -->
+        <div id="page-hash" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🔐</div>
+                    <div>
+                        <h3>Secure Login Simulator</h3>
+                        <p>Simulate password hashing and login verification using BCrypt</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="two-col">
+                    <div class="form-section">
+                        <h4>Login</h4>
+                        <div class="form-row"><label>Username</label><input type="text" id="hp-user" placeholder="e.g. john_doe"></div>
+                        <div class="form-row"><label>Password</label><input type="password" id="hp-pass" placeholder="Enter password"></div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="runHashPassword('login')">Login</button>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h4>Create Account</h4>
+                        <div class="form-row"><label>User Id</label><input type="text" id="hp-Guser" placeholder="Enter User id"></div>
+                        <div class="form-row"><label>Password</label><input type="password" id="hp-Gpass" placeholder="Enter password"></div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="runHashPassword('hash')">Create Account</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="loading-bar" id="load-hash"></div>
+                <div class="result-box" id="res-hash"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /hashpassword</span>
+                    </div>
+                    <div class="req-body"><span class="comment">// ── Login action ──────────────────────────────────</span>
+<span class="method">POST</span> <span class="endpoint">/hashpassword</span>
+Content-Type: application/json
+
+{
+  <span class="key">"username"</span>: <span class="val">"john_doe"</span>,
+  <span class="key">"password"</span>: <span class="val">"secret123"</span>
+}
+
+<span class="comment">// ── Hash action ───────────────────────────────────</span>
+<span class="method">POST</span> <span class="endpoint">/hashpassword</span>
+Content-Type: application/json
+
+{
+  <span class="key">"password"</span>: <span class="val">"secret123"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"status"</span>: <span class="val">"success"</span>,
+  <span class="key">"hash"</span>:   <span class="val">"$2a$10$abcdef..."</span>   <span class="comment">// BCrypt hash</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 2. JSON VALIDATE ══ -->
+        <div id="page-json" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">📄</div>
+                    <div>
+                        <h3>JSON Validate</h3>
+                        <p>Validate and pretty-print any JSON string</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>JSON Input</label><textarea id="jv-input" placeholder='{"name":"Alice","age":30}'></textarea></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('jsonvalidate','jv')">Validate JSON</button>
+                </div>
+                <div class="loading-bar" id="load-jv"></div>
+                <div class="result-box" id="res-jv"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /jsonvalidate</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/jsonvalidate</span>
+Content-Type: application/json
+
+{
+  <span class="key">"jsonInput"</span>: <span class="val">"{\"name\":\"Alice\",\"age\":30}"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"valid"</span>:   <span class="val">true</span>,
+  <span class="key">"pretty"</span>: <span class="val">"{\n  \"name\": \"Alice\",\n  \"age\": 30\n}"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 3. PASSWORD STRENGTH ══ -->
+        <div id="page-passcheck" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">💪</div>
+                    <div>
+                        <h3>Password Strength Checker</h3>
+                        <p>Evaluate strength level of a given password (Weak / Medium / Strong)</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Password</label><input type="password" id="pc-pass" placeholder="Enter password to evaluate"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('passwordchecker','pc')">Check Strength</button>
+                </div>
+                <div class="loading-bar" id="load-pc"></div>
+                <div class="result-box" id="res-pc"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /passwordchecker</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/passwordchecker</span>
+Content-Type: application/json
+
+{
+  <span class="key">"passStrength"</span>: <span class="val">"MyPass@123"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"strength"</span>: <span class="val">"Strong"</span>,
+  <span class="key">"score"</span>:    <span class="val">4</span>,
+  <span class="key">"tips"</span>:     <span class="val">["Add symbols to increase strength"]</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 4. UPTIME CHECKER ══ -->
+        <div id="page-uptime" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🌐</div>
+                    <div>
+                        <h3>Website Uptime Checker</h3>
+                        <p>Ping a URL and measure response time in milliseconds</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Website URL</label><input type="text" id="up-url" placeholder="https://example.com"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('websiteuptimechecker','up')">Check Uptime</button>
+                </div>
+                <div class="loading-bar" id="load-up"></div>
+                <div class="result-box" id="res-up"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /websiteuptimechecker</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/websiteuptimechecker</span>
+Content-Type: application/json
+
+{
+  <span class="key">"urlInput"</span>: <span class="val">"https://example.com"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"status"</span>:       <span class="val">"UP"</span>,
+  <span class="key">"responseTime"</span>: <span class="val">142</span>,   <span class="comment">// milliseconds</span>
+  <span class="key">"statusCode"</span>:   <span class="val">200</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 5. TEXT SIMILARITY ══ -->
+        <div id="page-textsim" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">📊</div>
+                    <div>
+                        <h3>Text Similarity Checker</h3>
+                        <p>Compare two texts and return a similarity score using cosine/Jaccard</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="two-col">
+                    <div class="form-row"><label>Text A</label><textarea id="ts-t1" placeholder="Enter first text..."></textarea></div>
+                    <div class="form-row"><label>Text B</label><textarea id="ts-t2" placeholder="Enter second text..."></textarea></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('textsimilaritychecker','ts')">Compare Texts</button>
+                </div>
+                <div class="loading-bar" id="load-ts"></div>
+                <div class="result-box" id="res-ts"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /textsimilaritychecker</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/textsimilaritychecker</span>
+Content-Type: application/json
+
+{
+  <span class="key">"text1"</span>: <span class="val">"hello world this is java"</span>,
+  <span class="key">"text2"</span>: <span class="val">"hello world this is python"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"similarity"</span>: <span class="val">80.0</span>,    <span class="comment">// percentage</span>
+  <span class="key">"method"</span>:     <span class="val">"Jaccard"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 6. SEARCH ENGINE ══ -->
+        <div id="page-search" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🔍</div>
+                    <div>
+                        <h3>Search Engine</h3>
+                        <p>Keyword search across all text files in a given directory</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Upload</label><input type="file" id="se-dir" placeholder="Upload the files.." multiple></div>
+                <div class="form-row"><label>Keyword</label><input type="text" id="se-kw" placeholder="error, exception, TODO..."></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="uploadAndSearch('searchengine','se', 'se-dir')">Search Files</button>
+                </div>
+                <div class="loading-bar" id="load-se"></div>
+                <div class="result-box" id="res-se"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /searchengine</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/searchengine</span>
+Content-Type: application/json
+
+{
+  <span class="key">"Upload"</span>: <span class="val">"Upload your files"</span>,
+  <span class="key">"keyWord"</span>:       <span class="val">"error"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"matches"</span>: [
+    { <span class="key">"file"</span>: <span class="val">"app.log"</span>, <span class="key">"line"</span>: <span class="val">42</span>, <span class="key">"text"</span>: <span class="val">"ERROR: NullPointerException"</span> }
+  ],
+  <span class="key">"count"</span>: <span class="val">1</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 7. LOG READER ══ -->
+        <div id="page-log" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">📋</div>
+                    <div>
+                        <h3>Log Reader</h3>
+                        <p>Parse a log file and count INFO / WARNING / ERROR entries</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Upload Log File</label><input type="file" id="lr-fp" placeholder="upload a log file (app.log)" multiple></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="uploadAndSearch('logreader','lr','lr-fp' )">Read Log File</button>
+                </div>
+                <div class="loading-bar" id="load-lr"></div>
+                <div class="result-box" id="res-lr"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /logreader</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/logreader</span>
+Content-Type: application/json
+
+{
+  <span class="key">"upload"</span>: <span class="val">"app.log"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"INFO"</span>:    <span class="val">120</span>,
+  <span class="key">"WARNING"</span>: <span class="val">15</span>,
+  <span class="key">"ERROR"</span>:   <span class="val">5</span>,
+  <span class="key">"total"</span>:   <span class="val">140</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 8. URL METADATA ══ -->
+        <div id="page-urlmeta" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">📈</div>
+                    <div>
+                        <h3>URL Metadata Extractor</h3>
+                        <p>Extract title, meta description, and link count from any URL</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>URL</label><input type="text" id="um-url" placeholder="https://example.com"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('urlmetadataextracter','um')">Extract Metadata</button>
+                </div>
+                <div class="loading-bar" id="load-um"></div>
+                <div class="result-box" id="res-um"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /urlmetadataextracter</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/urlmetadataextracter</span>
+Content-Type: application/json
+
+{
+  <span class="key">"urlMeta"</span>: <span class="val">"https://example.com"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"title"</span>:       <span class="val">"Example Domain"</span>,
+  <span class="key">"description"</span>: <span class="val">"This domain is for use in examples."</span>,
+  <span class="key">"linkCount"</span>:   <span class="val">3</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 9. VERIFY INTEGRITY ══ -->
+        <div id="page-integrity" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">✅</div>
+                    <div>
+                        <h3>Verify Integrity</h3>
+                        <p>Hash two inputs and compare — confirms data integrity match</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="two-col">
+                    <div class="form-row"><label>Input A</label><input type="text" id="vi-i1" placeholder="First value or file content"></div>
+                    <div class="form-row"><label>Input B</label><input type="text" id="vi-i2" placeholder="Second value or file content"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('verifyintegrity','vi')">Verify Integrity</button>
+                </div>
+                <div class="loading-bar" id="load-vi"></div>
+                <div class="result-box" id="res-vi"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /verifyintegrity</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/verifyintegrity</span>
+Content-Type: application/json
+
+{
+  <span class="key">"input1"</span>: <span class="val">"Hello World"</span>,
+  <span class="key">"input2"</span>: <span class="val">"Hello World"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"match"</span>:  <span class="val">true</span>,
+  <span class="key">"hash1"</span>:  <span class="val">"a591a6d40bf420404a011733..."</span>,
+  <span class="key">"hash2"</span>:  <span class="val">"a591a6d40bf420404a011733..."</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 10. DUPLICATE FINDER ══ -->
+        <div id="page-dupfind" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">📂</div>
+                    <div>
+                        <h3>Duplicate File Finder</h3>
+                        <p>Find duplicate text files in a directory by comparing MD5 hashes</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Directory Path</label><input type="file" id="df-dir" placeholder="upload the files" multiple></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="uploadAndSearch('duplicatefilefinder','df','df-dir')">Find Duplicates</button>
+                </div>
+                <div class="loading-bar" id="load-df"></div>
+                <div class="result-box" id="res-df"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /duplicatefilefinder</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/duplicatefilefinder</span>
+Content-Type: application/json
+
+{
+  <span class="key">"dupDirPath"</span>: <span class="val">"/home/user/docs"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"duplicates"</span>: [
+    { <span class="key">"hash"</span>: <span class="val">"abc123"</span>, <span class="key">"files"</span>: [<span class="val">"a.txt"</span>, <span class="val">"copy_a.txt"</span>] }
+  ],
+  <span class="key">"count"</span>: <span class="val">1</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 11. BLOCK ADS ══ -->
+        <div id="page-blockads" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🚫</div>
+                    <div>
+                        <h3>Block Ads</h3>
+                        <p>Check whether a URL matches the built-in ad-block list</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>URL to Check</label><input type="text" id="ba-url" placeholder="https://ad.doubleclick.net/pixel"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('blockads','ba')">Check URL</button>
+                </div>
+                <div class="loading-bar" id="load-ba"></div>
+                <div class="result-box" id="res-ba"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /blockads</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/blockads</span>
+Content-Type: application/json
+
+{
+  <span class="key">"blockUrl"</span>: <span class="val">"https://ad.doubleclick.net/pixel"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"blocked"</span>: <span class="val">true</span>,
+  <span class="key">"reason"</span>: <span class="val">"Matches ad domain: doubleclick.net"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 12. HTTP INSPECTOR ══ -->
+        <div id="page-http" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🔬</div>
+                    <div>
+                        <h3>HTTP Request Inspector</h3>
+                        <p>Inspect headers, status code, redirect chain, and timing for any URL</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>URL</label><input type="text" id="hi-url" placeholder="https://example.com"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('httprequestinspector','hi')">Inspect</button>
+                </div>
+                <div class="loading-bar" id="load-hi"></div>
+                <div class="result-box" id="res-hi"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /httprequestinspector</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/httprequestinspector</span>
+Content-Type: application/json
+
+{
+  <span class="key">"inspectUrl"</span>: <span class="val">"https://example.com"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"statusCode"</span>:    <span class="val">200</span>,
+  <span class="key">"responseTime"</span>:  <span class="val">95</span>,     <span class="comment">// ms</span>
+  <span class="key">"contentType"</span>:   <span class="val">"text/html; charset=UTF-8"</span>,
+  <span class="key">"server"</span>:        <span class="val">"ECS (nyb/1D2B)"</span>,
+  <span class="key">"headers"</span>:       { <span class="key">"Cache-Control"</span>: <span class="val">"max-age=604800"</span> }
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 13. MAIL SENDER ══ -->
+        <div id="page-mail" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">📧</div>
+                    <div>
+                        <h3>Mail Sender</h3>
+                        <p>Send an email via the backend JavaMail / SMTP service</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>From</label><input type="text" id="ml-to" placeholder="your@email.com"></div>
+                <div class="form-row"><label>Subject</label><input type="text" id="ml-sub" placeholder="Email subject line"></div>
+                <div class="form-row"><label>Message</label><textarea id="ml-body" placeholder="Write your message here..."></textarea></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('mail','ml')">Send Email</button>
+                </div>
+                <div class="loading-bar" id="load-ml"></div>
+                <div class="result-box" id="res-ml"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /mail</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/mail</span>
+Content-Type: application/json
+
+{
+  <span class="key">"From"</span>:      <span class="val">"your@email.com"</span>,
+  <span class="key">"To"</span>:      <span class="val">"my@email.com"</span>,
+  <span class="key">"subject"</span>: <span class="val">"Hello from Java"</span>,
+  <span class="key">"text"</span>:    <span class="val">"This is the email body message."</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"status"</span>:  <span class="val">"sent"</span>,
+  <span class="key">"message"</span>: <span class="val">"Email delivered successfully"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 14. QUOTES API ══ -->
+        <div id="page-quotes" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">💬</div>
+                    <div>
+                        <h3>Quotes API</h3>
+                        <p>Fetch a random quotes</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Random Quotes</label><input type="hidden" id="qa-q" placeholder="success, life, courage, wisdom..."></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('quotesapi','qa')">Get Quote</button>
+                </div>
+                <div class="loading-bar" id="load-qa"></div>
+                <div class="result-box" id="res-qa"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /quotesapi</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/quotesapi</span>
+Content-Type: application/json
+
+{
+  <span class="key">"query"</span>: <span class="val">"success"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"quote"</span>:  <span class="val">"Success is not final, failure is not fatal..."</span>,
+  <span class="key">"author"</span>: <span class="val">"Winston Churchill"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 15. BUG TRACKER ══ -->
+        <div id="page-bug" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🐛</div>
+                    <div>
+                        <h3>Bug Tracker</h3>
+                        <p>Add, view, and update bug status in the in-memory tracker</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="two-col">
+                    <div class="form-section">
+                        <h4>Add Bug</h4>
+                        <div class="form-row"><label>Title</label><input type="text" id="bt-title" placeholder="Describe the bug"></div>
+                        <div class="form-row">
+                            <label>Priority</label>
+                            <select id="bt-pri"><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option></select>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="runBugTracker('add')">Add Bug</button>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h4>Update Status</h4>
+                        <div class="form-row"><label>Bug ID</label><input type="number" id="bt-id" placeholder="Enter Bug ID"></div>
+                        <div class="form-row">
+                            <label>New Status</label>
+                            <select id="bt-status"><option value="open">open</option><option value="in-progress">in-progress</option><option value="closed">closed</option></select>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="runBugTracker('update')">Update Status</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-outline" onclick="runBugTracker('view')">View All Bugs</button>
+                </div>
+                <div class="loading-bar" id="load-bt"></div>
+                <div class="result-box" id="res-bt"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /bugtracker</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/bugtracker</span>
+Content-Type: application/json
+
+<span class="comment">// ── Add Bug ───────────────────────────────────────</span>
+{ <span class="key">"action"</span>: <span class="val">"add"</span>, <span class="key">"title"</span>: <span class="val">"Login fails on mobile"</span>, <span class="key">"priority"</span>: <span class="val">"High"</span> }
+
+<span class="comment">// ── View All Bugs ─────────────────────────────────</span>
+{ <span class="key">"action"</span>: <span class="val">"view"</span> }
+
+<span class="comment">// ── Update Status ─────────────────────────────────</span>
+{ <span class="key">"action"</span>: <span class="val">"update"</span>, <span class="key">"id"</span>: <span class="val">3</span>, <span class="key">"status"</span>: <span class="val">"closed"</span> }
+
+<span class="comment">// ── Expected response (view) ──────────────────────</span>
+{
+  <span class="key">"bugs"</span>: [
+    { <span class="key">"id"</span>: <span class="val">1</span>, <span class="key">"title"</span>: <span class="val">"Login fails"</span>, <span class="key">"priority"</span>: <span class="val">"High"</span>, <span class="key">"status"</span>: <span class="val">"open"</span> }
+  ]
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 16. SQL INJECTION ══ -->
+        <div id="page-sql" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🛡️</div>
+                    <div>
+                        <h3>SQL Injection Checker</h3>
+                        <p>Detect SQL injection attack patterns in username/password fields</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Username</label><input type="text" id="sq-u" placeholder="e.g. admin' OR 1=1--"></div>
+                <div class="form-row"><label>Password</label><input type="password" id="sq-p" placeholder="Enter password"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('sqlinjection','sq')">Check Vulnerability</button>
+                </div>
+                <div class="loading-bar" id="load-sq"></div>
+                <div class="result-box" id="res-sq"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /sqlinjection</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/sqlinjection</span>
+Content-Type: application/json
+
+{
+  <span class="key">"sqlUsername"</span>: <span class="val">"admin' OR 1=1--"</span>,
+  <span class="key">"sqlPassword"</span>: <span class="val">"anypassword"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"vulnerable"</span>: <span class="val">true</span>,
+  <span class="key">"pattern"</span>:   <span class="val">"OR 1=1"</span>,
+  <span class="key">"risk"</span>:      <span class="val">"High"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 17. BREACH CHECKER ══ -->
+        <div id="page-breach" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🔓</div>
+                    <div>
+                        <h3>Password Breach Checker</h3>
+                        <p>Check if a password appears in known data breaches (HIBP SHA-1 k-anon)</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Password</label><input type="password" id="br-pass" placeholder="Enter password to check"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('passwordbreachcheck','br')">Check Breach</button>
+                </div>
+                <div class="loading-bar" id="load-br"></div>
+                <div class="result-box" id="res-br"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /passwordbreachcheck</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/passwordbreachcheck</span>
+Content-Type: application/json
+
+{
+  <span class="key">"breachPassword"</span>: <span class="val">"password123"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"breached"</span>: <span class="val">true</span>,
+  <span class="key">"count"</span>:   <span class="val">247832</span>,   <span class="comment">// times seen in breaches</span>
+  <span class="key">"advice"</span>:  <span class="val">"Change this password immediately"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 18. RESUME SCANNER ══ -->
+        <div id="page-resume" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">📄</div>
+                    <div>
+                        <h3>Resume Keyword Scanner</h3>
+                        <p>Match your skills against a job role and get a fit percentage</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="two-col">
+                    <div class="form-row"><label>Your Skills</label><textarea id="rs-skills" placeholder="Java, Spring Boot, SQL, REST API, Git..."></textarea></div>
+                    <div class="form-row"><label>Job Role Required Skills</label><textarea id="rs-job" placeholder="Python, Django, PostgreSQL, Docker..."></textarea></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('resumekeywordscanner','rs')">Analyze Fit</button>
+                </div>
+                <div class="loading-bar" id="load-rs"></div>
+                <div class="result-box" id="res-rs"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /resumekeywordscanner</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/resumekeywordscanner</span>
+Content-Type: application/json
+
+{
+  <span class="key">"resumeSkills"</span>:  <span class="val">"Java, Spring Boot, SQL, REST API"</span>,
+  <span class="key">"jobRoleSkills"</span>: <span class="val">"Java, Python, SQL, Docker, Git"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"matchPercent"</span>: <span class="val">60.0</span>,
+  <span class="key">"matched"</span>:      [<span class="val">"Java"</span>, <span class="val">"SQL"</span>],
+  <span class="key">"missing"</span>:      [<span class="val">"Python"</span>, <span class="val">"Docker"</span>, <span class="val">"Git"</span>]
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 19. ROBOT.TXT ══ -->
+        <div id="page-robot" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🤖</div>
+                    <div>
+                        <h3>Robot.txt Rules</h3>
+                        <p>Fetch and display robots.txt crawling directives from any website</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Website URL</label><input type="text" id="rb-url" placeholder="https://example.com"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('robottextrules','rb')">Get Robots.txt</button>
+                </div>
+                <div class="loading-bar" id="load-rb"></div>
+                <div class="result-box" id="res-rb"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /robottextrules</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/robottextrules</span>
+Content-Type: application/json
+
+{
+  <span class="key">"robotUrl"</span>: <span class="val">"https://example.com"</span>
+}
+
+<span class="comment">// ── Fetches: https://example.com/robots.txt ───────</span>
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"rules"</span>: [
+    { <span class="key">"agent"</span>: <span class="val">"*"</span>, <span class="key">"disallow"</span>: [<span class="val">"/admin"</span>, <span class="val">"/private"</span>] }
+  ],
+  <span class="key">"sitemapUrl"</span>: <span class="val">"https://example.com/sitemap.xml"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 20. ROOM BOOKING ══ -->
+        <div id="page-booking" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">🏠</div>
+                    <div>
+                        <h3>Room Booking System</h3>
+                        <p>Book, view, and cancel room time slots in the system</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="two-col">
+                    <div class="form-section">
+                        <h4>Book a Slot</h4>
+                        <div class="form-row"><label>Name</label><input type="text" id="bk-name" placeholder="Your full name"></div>
+                        <div class="form-row"><label>Date</label><input type="date" id="bk-date"></div>
+                        <div class="form-row"><label>Slot</label><input type="text" id="bk-slot" placeholder="10:00–11:00"></div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="runBooking('book')">Book Slot</button>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h4>Cancel Booking</h4>
+                        <div class="form-row"><label>Booking ID</label><input type="number" id="bk-cid" placeholder="Enter Booking ID"></div>
+                        <div class="btn-row">
+                            <button class="btn btn-danger" onclick="runBooking('cancel')">Cancel Booking</button>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <button class="btn btn-outline" onclick="runBooking('view')">View All Bookings</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="loading-bar" id="load-bk"></div>
+                <div class="result-box" id="res-bk"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /booking</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/booking</span>
+Content-Type: application/json
+
+<span class="comment">// ── Book Slot ─────────────────────────────────────</span>
+{ <span class="key">"action"</span>: <span class="val">"book"</span>, <span class="key">"name"</span>: <span class="val">"Alice"</span>, <span class="key">"date"</span>: <span class="val">"2025-08-01"</span>, <span class="key">"slot"</span>: <span class="val">"10:00–11:00"</span> }
+
+<span class="comment">// ── View All ──────────────────────────────────────</span>
+{ <span class="key">"action"</span>: <span class="val">"view"</span> }
+
+<span class="comment">// ── Cancel ────────────────────────────────────────</span>
+{ <span class="key">"action"</span>: <span class="val">"cancel"</span>, <span class="key">"id"</span>: <span class="val">2</span> }
+
+<span class="comment">// ── Expected response (book) ──────────────────────</span>
+{
+  <span class="key">"status"</span>: <span class="val">"booked"</span>,
+  <span class="key">"id"</span>:     <span class="val">5</span>,
+  <span class="key">"slot"</span>:   <span class="val">"10:00–11:00 on 2025-08-01"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 21. SOCKET CHAT ══ -->
+        <div id="page-chat" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">💬</div>
+                    <div>
+                        <h3>Socket Chat</h3>
+                        <p>Real-time WebSocket chat — connect with other users on the local network</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+
+                <div id="chat-setup">
+                    <div class="form-row"><label>Your Display Name</label><input type="text" id="ck-name" placeholder="Enter your name to join..."></div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" onclick="startChat()">Join Chat</button>
+                    </div>
+                </div>
+
+                <div id="chat-interface" style="display:none;">
+                    <div class="two-col">
+                        <div>
+                            <div style="font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Online Users</div>
+                            <ul id="chat-users-list"></ul>
+                        </div>
+                        <div>
+                            <div style="font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Messages</div>
+                            <div id="chat-messages"></div>
+                            <div style="display:flex;gap:8px;">
+                                <input type="text" id="chat-msg-input" placeholder="Type a message..." style="flex:1;" onkeypress="sendOnEnter(event)">
+                                <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="req-section" style="margin-top:22px;">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-ws">WS</span>
+                        <span>Backend Connection — WebSocket /chat</span>
+                    </div>
+                    <div class="req-body"><span class="comment">// ── 1. Connect ────────────────────────────────────</span>
+<span class="method">WS</span> <span class="endpoint">ws://localhost:8080/NetworkProjects-1.0-SNAPSHOT/chat</span>
+
+<span class="comment">// ── 2. On open — send your name immediately ───────</span>
+ws.send(<span class="val">"Alice"</span>)
+
+<span class="comment">// ── 3. Send private message to a user ────────────</span>
+ws.send(<span class="val">"Bob:Hello Bob!"</span>)   <span class="comment">// format: "username:message"</span>
+
+<span class="comment">// ── 4. Server → client: online user list ─────────</span>
+<span class="key">Received:</span> <span class="val">"online:Alice,Bob,Carol"</span>
+
+<span class="comment">// ── 5. Server → client: incoming message ─────────</span>
+<span class="key">Received:</span> <span class="val">"Alice → Bob: Hello Bob!"</span>
+
+<span class="comment">// ── WebSocket lifecycle ───────────────────────────</span>
+ws.onopen    → send name string
+ws.onmessage → parse "online:" prefix OR display chat message
+ws.onclose   → show disconnected alert
+ws.onerror   → log to console</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ 22. MAIL SENDER ══ -->
+        <div id="page-mailg" class="page">
+            <div class="pcard">
+                <div class="pcard-header">
+                    <div class="icon-badge">📧</div>
+                    <div>
+                        <h3>Mail Pattern Generator</h3>
+                        <p>Generate possible corporate email IDs from employee name.</p>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="form-row"><label>Name</label><input type="text" id="mlg-na" placeholder="your name"></div>
+                <div class="form-row"><label>Domain name</label><input type="text" id="mlg-do" placeholder="Domain name"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runProject('mailgenerator','mlg')">Send Email</button>
+                </div>
+                <div class="loading-bar" id="load-mlg"></div>
+                <div class="result-box" id="res-mlg"></div>
+                <div class="req-section">
+                    <div class="req-section-header">
+                        <span class="method-badge badge-post">POST</span>
+                        <span>Backend Request — /mailgenerator</span>
+                    </div>
+                    <div class="req-body"><span class="method">POST</span> <span class="endpoint">/mailgenerator</span>
+Content-Type: application/json
+
+{
+  <span class="key">"Name"</span>:      <span class="val">"tamil"</span>,
+  <span class="key">"Domain"</span>:      <span class="val">"email.com"</span>
+}
+
+<span class="comment">// ── Expected response ─────────────────────────────</span>
+{
+  <span class="key">"pattern"</span>:  <span class="val">"tamil@email.com"</span>
+}</div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end #main -->
+
+    <script>
+        /* Upload a file and Search */
+        function uploadAndSearch(endpoint, prefix, ids) {
+            const files = document.getElementById(ids).files;
+            const keyword = document.getElementById("se-kw").value;
+
+            const formData = new FormData();
+            formData.append("keyword", keyword);
+
+            for (let i = 0; i < files.length; i++) {
+                formData.append("files", files[i]);
+            }
+
+            fetch('/NetworkProjects-1.0-SNAPSHOT/'+endpoint, {
+                method: "POST",
+                body: formData
+            })
+            .then(function(res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+                return res.json();
+            })
+            .then(function(d) { showRes(prefix, JSON.stringify(d, null, 2)); })
+            .catch(function(err) { showRes(prefix, '❌ Error: ' + err.message); })
+            .finally(function() { showLoad(prefix, false); });
+        }
+        /* ── NAVIGATION ── */
+        function showPage(id, li) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('#nav-list li').forEach(l => l.classList.remove('active'));
+            var pg = document.getElementById('page-' + id);
+            if (pg) pg.classList.add('active');
+            if (li) li.classList.add('active');
+        }
+
+        function nav(id) {
+            var li = document.querySelector('[data-page="' + id + '"]');
+            showPage(id, li);
+        }
+
+        function filterNav(val) {
+            var q = val.toLowerCase();
+            document.querySelectorAll('#nav-list li').forEach(function(li) {
+                li.style.display = li.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        /* ── LOADING / RESULT HELPERS ── */
+        function showLoad(prefix, on) {
+            var lb = document.getElementById('load-' + prefix);
+            if (lb) lb.style.display = on ? 'block' : 'none';
+        }
+
+        function showRes(prefix, content) {
+            var rb = document.getElementById('res-' + prefix);
+            if (rb) { rb.style.display = 'block'; rb.innerHTML = '<pre>' + content + '</pre>'; }
+        }
+
+        /* ── GENERIC PROJECT RUNNER ── */
+        function runProject(endpoint, prefix) {
+            var data = collectInputs(prefix);
+            showLoad(prefix, true);
+            fetch('/NetworkProjects-1.0-SNAPSHOT/' + endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(function(res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+                return res.json();
+            })
+            .then(function(d) { showRes(prefix, JSON.stringify(d, null, 2)); })
+            .catch(function(err) { showRes(prefix, '❌ Error: ' + err.message); })
+            .finally(function() { showLoad(prefix, false); });
+        }
+
+        /* ── COLLECT ALL INPUTS WITH A PREFIX ── */
+        function collectInputs(prefix) {
+            var data = {};
+            var fieldMap = {
+                'hp': ['hp-user:username', 'hp-pass:password', 'hp-hash:password'],
+                'jv': ['jv-input:jsonInput'],
+                'pc': ['pc-pass:passStrength'],
+                'up': ['up-url:urlInput'],
+                'ts': ['ts-t1:text1', 'ts-t2:text2'],
+                'se': ['se-dir:directoryPath', 'se-kw:keyWord'],
+                'lr': ['lr-fp:filePath'],
+                'um': ['um-url:urlMeta'],
+                'vi': ['vi-i1:input1', 'vi-i2:input2'],
+                'df': ['df-dir:dupDirPath'],
+                'ba': ['ba-url:blockUrl'],
+                'hi': ['hi-url:inspectUrl'],
+                'ml': ['ml-to:to', 'ml-sub:subject', 'ml-body:text'],
+                'mlg': ['mlg-na:Name', 'mlg-do:Domain'],
+                'qa': ['qa-q:query'],
+                'sq': ['sq-u:sqlUsername', 'sq-p:sqlPassword'],
+                'br': ['br-pass:breachPassword'],
+                'rs': ['rs-skills:resumeSkills', 'rs-job:jobRoleSkills'],
+                'rb': ['rb-url:robotUrl']
+            };
+            var fields = fieldMap[prefix] || [];
+            fields.forEach(function(f) {
+                var parts = f.split(':');
+                var el = document.getElementById(parts[0]);
+                if (el && el.value.trim()) data[parts[1]] = el.value.trim();
+            });
+            return data;
+        }
+
+        /* ── HASH PASSWORD ── */
+        function runHashPassword(action) {
+            var data = {action: action};
+            if (action === 'login') {
+                data.username = document.getElementById('hp-user').value;
+                data.password = document.getElementById('hp-pass').value;
+            } else {
+                data.username = document.getElementById('hp-Guser').value;
+                data.password = document.getElementById('hp-Guser').value;
+            }
+            showLoad('hash', true);
+            fetch('/NetworkProjects-1.0-SNAPSHOT/hashpassword', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { showRes('hash', JSON.stringify(d, null, 2)); })
+            .catch(function(e) { showRes('hash', '❌ Error: ' + e.message); })
+            .finally(function() { showLoad('hash', false); });
+        }
+
+        /* ── BUG TRACKER ── */
+        function runBugTracker(action) {
+            var data = { action: action };
+            if (action === 'add') {
+                data.title = document.getElementById('bt-title').value;
+                data.priority = document.getElementById('bt-pri').value;
+            } else if (action === 'update') {
+                data.id = document.getElementById('bt-id').value;
+                data.status = document.getElementById('bt-status').value;
+            }
+            showLoad('bt', true);
+            fetch('/NetworkProjects-1.0-SNAPSHOT/bugtracker', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { showRes('bt', JSON.stringify(d, null, 2)); })
+            .catch(function(e) { showRes('bt', '❌ Error: ' + e.message); })
+            .finally(function() { showLoad('bt', false); });
+        }
+
+        /* ── ROOM BOOKING ── */
+        function runBooking(action) {
+            var data = { action: action };
+            if (action === 'book') {
+                data.name = document.getElementById('bk-name').value;
+                data.date = document.getElementById('bk-date').value;
+                data.slot = document.getElementById('bk-slot').value;
+            } else if (action === 'cancel') {
+                data.id = document.getElementById('bk-cid').value;
+            }
+            showLoad('bk', true);
+            fetch('/NetworkProjects-1.0-SNAPSHOT/booking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { showRes('bk', JSON.stringify(d, null, 2)); })
+            .catch(function(e) { showRes('bk', '❌ Error: ' + e.message); })
+            .finally(function() { showLoad('bk', false); });
+        }
+
+        /* ── WEBSOCKET CHAT ── */
+        var ws;
+        var selectedChatUser = null;
+
+        function startChat() {
+            var name = document.getElementById('ck-name').value.trim();
+            if (!name) { alert('Please enter your name!'); return; }
+            document.getElementById('chat-setup').style.display = 'none';
+            document.getElementById('chat-interface').style.display = 'block';
+            const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+
+             ws = new WebSocket(
+                protocol + window.location.host + "/NetworkProjects-1.0-SNAPSHOT/chat"
+                );
+
+            ws.onopen = function() { ws.send(name); };
+
+            ws.onmessage = function(event) {
+                var msg = event.data;
+                if (msg.startsWith('online:')) {
+                    var users = msg.substring(7).split(',').filter(function(u) { return u; });
+                    updateChatUsers(users);
+                } else {
+                    appendChatMessage(msg, false);
+                }
+            };
+
+            ws.onclose = function() { alert('Chat disconnected'); };
+            ws.onerror = function(err) { console.error('WebSocket error:', err); };
+        }
+
+        function updateChatUsers(users) {
+            var list = document.getElementById('chat-users-list');
+            list.innerHTML = '';
+            users.forEach(function(user) {
+                var li = document.createElement('li');
+                li.textContent = user;
+                li.onclick = function() { selectChatUser(user, li); };
+                list.appendChild(li);
+            });
+        }
+
+        function selectChatUser(user, li) {
+            selectedChatUser = user;
+            document.querySelectorAll('#chat-users-list li').forEach(function(el) { el.classList.remove('selected'); });
+            li.classList.add('selected');
+            document.getElementById('chat-msg-input').placeholder = 'Message to ' + user + '...';
+        }
+
+        function sendMessage() {
+            var msg = document.getElementById('chat-msg-input').value.trim();
+            if (!msg || !selectedChatUser) { alert('Select a user and type a message!'); return; }
+            ws.send(selectedChatUser + ':' + msg);
+            appendChatMessage('You → ' + selectedChatUser + ': ' + msg, true);
+            document.getElementById('chat-msg-input').value = '';
+        }
+
+        function appendChatMessage(msg, isMine) {
+            var box = document.getElementById('chat-messages');
+            var div = document.createElement('div');
+            div.className = 'chat-msg' + (isMine ? '' : ' received');
+            div.textContent = msg;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function sendOnEnter(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <display-name>NetworkProjects Web App</display-name>
+
+    <!-- Servlet mappings -->
+    <servlet>
+        <servlet-name>HashPasswordServlet</servlet-name>
+        <servlet-class>org.example.controller.HashPasswordServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HashPasswordServlet</servlet-name>
+        <url-pattern>/hashpassword</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>JsonValidateServlet</servlet-name>
+        <servlet-class>org.example.controller.JsonValidateServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JsonValidateServlet</servlet-name>
+        <url-pattern>/jsonvalidate</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PasswordCheckerServlet</servlet-name>
+        <servlet-class>org.example.controller.PasswordCheckerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PasswordCheckerServlet</servlet-name>
+        <url-pattern>/passwordchecker</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>WebSiteUptimeCheckerServlet</servlet-name>
+        <servlet-class>org.example.controller.WebSiteUptimeCheckerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WebSiteUptimeCheckerServlet</servlet-name>
+        <url-pattern>/websiteuptimechecker</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>TextSimilarityCheckerServlet</servlet-name>
+        <servlet-class>org.example.controller.TextSimilarityCheckerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TextSimilarityCheckerServlet</servlet-name>
+        <url-pattern>/textsimilaritychecker</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SearchEngineServlet</servlet-name>
+        <servlet-class>org.example.controller.SearchEngineServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SearchEngineServlet</servlet-name>
+        <url-pattern>/searchengine</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LogReaderServlet</servlet-name>
+        <servlet-class>org.example.controller.LogReaderServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogReaderServlet</servlet-name>
+        <url-pattern>/logreader</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UrlMetaExtractorServlet</servlet-name>
+        <servlet-class>org.example.controller.UrlMetaExtractorServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UrlMetaExtractorServlet</servlet-name>
+        <url-pattern>/urlmetadataextracter</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VerifyIntegrityServlet</servlet-name>
+        <servlet-class>org.example.controller.VerifyIntegrityServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VerifyIntegrityServlet</servlet-name>
+        <url-pattern>/verifyintegrity</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DuplicateFileFinderServlet</servlet-name>
+        <servlet-class>org.example.controller.DuplicateFileFinderServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DuplicateFileFinderServlet</servlet-name>
+        <url-pattern>/duplicatefilefinder</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>BlockAdsServlet</servlet-name>
+        <servlet-class>org.example.controller.BlockAdsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BlockAdsServlet</servlet-name>
+        <url-pattern>/blockads</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>HttpInspectorServlet</servlet-name>
+        <servlet-class>org.example.controller.HttpInspectorServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HttpInspectorServlet</servlet-name>
+        <url-pattern>/httprequestinspector</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>MailServlet</servlet-name>
+        <servlet-class>org.example.controller.MailServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MailServlet</servlet-name>
+        <url-pattern>/mail</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>QuotesServlet</servlet-name>
+        <servlet-class>org.example.controller.QuotesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>QuotesServlet</servlet-name>
+        <url-pattern>/quotesapi</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>BugTrackerServlet</servlet-name>
+        <servlet-class>org.example.controller.BugTrackerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BugTrackerServlet</servlet-name>
+        <url-pattern>/bugtracker</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>MailPatternGenerator</servlet-name>
+        <servlet-class>org.example.controller.MailPatternGenerator</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MailPatternGenerator</servlet-name>
+        <url-pattern>/mailgenerator</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SqlVulnerableCheckerServlet</servlet-name>
+        <servlet-class>org.example.controller.SqlVulnerableCheckerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SqlVulnerableCheckerServlet</servlet-name>
+        <url-pattern>/sqlinjection</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PasswordBreachCheckerServlet</servlet-name>
+        <servlet-class>org.example.controller.PasswordBreachCheckerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PasswordBreachCheckerServlet</servlet-name>
+        <url-pattern>/passwordbreachcheck</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ResumeKeywordScannerServlet</servlet-name>
+        <servlet-class>org.example.controller.ResumeKeywordScannerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ResumeKeywordScannerServlet</servlet-name>
+        <url-pattern>/resumekeywordscanner</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RobotTextRulesServlet</servlet-name>
+        <servlet-class>org.example.controller.RobotTextRulesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RobotTextRulesServlet</servlet-name>
+        <url-pattern>/robottextrules</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>BookingServlet</servlet-name>
+        <servlet-class>org.example.controller.BookingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BookingServlet</servlet-name>
+        <url-pattern>/booking</url-pattern>
+    </servlet-mapping>
+
+    <!-- Add more servlets here for other projects -->
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+</web-app>
