@@ -1490,11 +1490,11 @@ Content-Type: application/json
             }
         });
 
+        const API_URL = "https://network-projects-do46.onrender.com/";
         /* Upload a file and Search */
         function uploadAndSearch(endpoint, prefix, ids) {
             const files = document.getElementById(ids).files;
             const keyword = document.getElementById("se-kw").value;
-            const API_URL = "https://network-projects-do46.onrender.com/";
 
             const formData = new FormData();
             formData.append("keyword", keyword);
