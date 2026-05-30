@@ -6,8 +6,8 @@ import java.util.Properties;
 
 public class MailService {
 
-    private final static String password = "fyjd xwyu btna rqvf"; // Replace with actual app password
-    private final static String myEmail = "tamizhselvan7821@gmail.com"; // Replace with actual email
+    private final static String password = System.getenv("PASSWORD"); // Replace with actual app password
+    private final static String myEmail = System.getenv("MAIL"); // Replace with actual email
 
     public String sendMail(String to, String subject, String text) {
 

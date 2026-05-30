@@ -1481,11 +1481,20 @@ Content-Type: application/json
     </div><!-- end #main -->
 
     <script>
+
+        window.addEventListener("load", async () => {
+            try {
+                await fetch("https://my-api.onrender.com/health");
+            } catch (e) {
+                console.log("Wake-up request failed");
+            }
+        });
+
         /* Upload a file and Search */
         function uploadAndSearch(endpoint, prefix, ids) {
             const files = document.getElementById(ids).files;
             const keyword = document.getElementById("se-kw").value;
-            const API_URL = "https://network-projects.vercel.app/";
+            const API_URL = "https://network-projects-do46.onrender.com/";
 
             const formData = new FormData();
             formData.append("keyword", keyword);
