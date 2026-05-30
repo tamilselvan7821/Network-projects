@@ -1485,6 +1485,7 @@ Content-Type: application/json
         function uploadAndSearch(endpoint, prefix, ids) {
             const files = document.getElementById(ids).files;
             const keyword = document.getElementById("se-kw").value;
+            const API_URL = "https://network-projects.vercel.app/";
 
             const formData = new FormData();
             formData.append("keyword", keyword);
@@ -1493,7 +1494,7 @@ Content-Type: application/json
                 formData.append("files", files[i]);
             }
 
-            fetch('/NetworkProjects-1.0-SNAPSHOT/'+endpoint, {
+            fetch(API_URL+endpoint, {
                 method: "POST",
                 body: formData
             })
@@ -1541,7 +1542,7 @@ Content-Type: application/json
         function runProject(endpoint, prefix) {
             var data = collectInputs(prefix);
             showLoad(prefix, true);
-            fetch('/NetworkProjects-1.0-SNAPSHOT/' + endpoint, {
+            fetch(API_URL + endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -1599,7 +1600,7 @@ Content-Type: application/json
                 data.password = document.getElementById('hp-Guser').value;
             }
             showLoad('hash', true);
-            fetch('/NetworkProjects-1.0-SNAPSHOT/hashpassword', {
+            fetch(API_URL+'hashpassword', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -1621,7 +1622,7 @@ Content-Type: application/json
                 data.status = document.getElementById('bt-status').value;
             }
             showLoad('bt', true);
-            fetch('/NetworkProjects-1.0-SNAPSHOT/bugtracker', {
+            fetch(API_URL+'bugtracker', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -1643,7 +1644,7 @@ Content-Type: application/json
                 data.id = document.getElementById('bk-cid').value;
             }
             showLoad('bk', true);
-            fetch('/NetworkProjects-1.0-SNAPSHOT/booking', {
+            fetch(API_URL+'booking', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -1666,7 +1667,7 @@ Content-Type: application/json
             const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
 
              ws = new WebSocket(
-                protocol + window.location.host + "/NetworkProjects-1.0-SNAPSHOT/chat"
+                protocol + window.location.host + API_URL+"chat"
                 );
 
             ws.onopen = function() { ws.send(name); };
