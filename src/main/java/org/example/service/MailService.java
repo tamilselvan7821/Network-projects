@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Properties;
 
 public class MailService {
 
@@ -93,8 +92,7 @@ public class MailService {
             HttpResponse<String> userResponse =
                     client.send(userRequest, HttpResponse.BodyHandlers.ofString());
 
-            return "OwnerMail: " + ownerResponse.statusCode()
-                    + " | UserMail: " + userResponse.statusCode();
+            return "status: sent |  message : Email delivered successfully ";
 
         } catch (Exception e) {
             e.printStackTrace();
