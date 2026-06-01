@@ -10,13 +10,11 @@ public class MailService {
     private final static String myEmail = System.getenv("MAIL"); // Replace with actual email
 
     public String sendMail(String to, String subject, String text) {
-        System.out.println("MAIL = " + myEmail);
-        System.out.println("PASSWORD  = "+ password );
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.port", "465");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.enable", "true");
 
         props.put("mail.smtp.connectiontimeout", "10000");
         props.put("mail.smtp.timeout", "10000");
@@ -33,7 +31,7 @@ public class MailService {
                     java.net.InetAddress.getByName("smtp.gmail.com");
 
             System.out.println("SMTP IP = " + addr.getHostAddress());
-            
+
             Message adminMsg = new MimeMessage(session);
 
             adminMsg.setFrom(new InternetAddress(myEmail));
