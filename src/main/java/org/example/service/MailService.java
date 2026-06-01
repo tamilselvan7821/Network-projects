@@ -20,26 +20,31 @@ public class MailService {
 
             HttpClient client = HttpClient.newHttpClient();
 
-            // 1️⃣ MAIL TO YOU (PORTFOLIO OWNER)
+            // 1️⃣ Build HTML properly first
+            String htmlOwner = """
+            <div style="font-family:Arial">
+                <h2>📩 New Portfolio Contact</h2>
+                <p><b>From:</b> %s</p>
+                <p><b>Subject:</b> %s</p>
+                <p><b>Message:</b><br>%s</p>
+            </div>
+        """.formatted(to, subject, message);
+
             String ownerMail = """
         {
           "sender": {
-            "name": "Tamilselvan",
+            "name": "Tamilselvan Portfolio",
             "email": "%s"
           },
           "to": [
             {
-              "email": "%s",
-              "name": "Tamilselvan"
+              "email": "%s"
             }
           ],
-          "subject": "📩 Contact: %s",
-          "htmlContent": "<h2>New Contact Request</h2>"
-                        + "<p><b>From:</b> %s</p>"
-                        + "<p><b>Subject:</b> %s</p>"
-                        + "<p><b>Message:</b><br>%s</p>"
+          "subject": "New Portfolio Contact - %s",
+          "htmlContent": "%s"
         }
-        """.formatted(USERMAIL, USERMAIL, subject, to, subject, message);
+        """.formatted(USERMAIL, USERMAIL, subject, escapeJson(htmlOwner));
 
             HttpRequest ownerRequest = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
@@ -51,8 +56,18 @@ public class MailService {
             HttpResponse<String> ownerResponse =
                     client.send(ownerRequest, HttpResponse.BodyHandlers.ofString());
 
-            // 2️⃣ AUTO REPLY TO USER
-            String autoReply = """
+            // 2️⃣ USER AUTO REPLY
+            String htmlUser = """
+            <div style="font-family:Arial">
+                <h2>Thanks for contacting me 🙌</h2>
+                <p>Hi %s,</p>
+                <p>I received your message and will reply soon.</p>
+                <br>
+                <p>— Tamilselvan</p>
+            </div>
+        """.formatted(to);
+
+            String userMail = """
         {
           "sender": {
             "name": "Tamilselvan",
@@ -64,18 +79,15 @@ public class MailService {
             }
           ],
           "subject": "Thanks for contacting me 🙌",
-          "htmlContent": "<h2>Hi %s 👋</h2>"
-                        + "<p>Thanks for reaching out through my portfolio.</p>"
-                        + "<p>I have received your message and will reply soon.</p>"
-                        + "<br><p>— Tamilselvan</p>"
+          "htmlContent": "%s"
         }
-        """.formatted(USERMAIL, to, to);
+        """.formatted(USERMAIL, to, escapeJson(htmlUser));
 
             HttpRequest userRequest = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
                     .header("api-key", API_KEY)
                     .header("content-type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(autoReply))
+                    .POST(HttpRequest.BodyPublishers.ofString(userMail))
                     .build();
 
             HttpResponse<String> userResponse =
@@ -88,5 +100,11 @@ public class MailService {
             e.printStackTrace();
             return "Error: " + e.getMessage();
         }
+    }
+    private String escapeJson(String text) {
+        return text
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "");
     }
 }
