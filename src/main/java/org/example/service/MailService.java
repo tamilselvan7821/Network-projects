@@ -6,59 +6,58 @@ import java.util.Properties;
 
 public class MailService {
 
-//    private final static String password = System.getenv("PASSWORD"); // Replace with actual app password
-//    private final static String myEmail = System.getenv("MAIL");
-
-    private final static String password = "fyjd xwyu btna rqvf"; // Replace with actual app password
-    private final static String myEmail = "tamizhselvan7821@gmail.com"; // Replace with actual email
+    private final static String password = System.getenv("PASSWORD"); // Replace with actual app password
+    private final static String myEmail = System.getenv("MAIL");
+    private final static String userMail = System.getenv("USERMAIL");
 
     public String sendMail(String to, String subject, String text) {
         Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "465");
+
+        props.put("mail.smtp.host", "smtp-relay.brevo.com");
+        props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.starttls.enable", "true");
 
-        props.put("mail.smtp.connectiontimeout", "10000");
-        props.put("mail.smtp.timeout", "10000");
-        props.put("mail.smtp.writetimeout", "10000");
+        props.put("mail.smtp.connectiontimeout", "60000");
+        props.put("mail.smtp.timeout", "60000");
+        props.put("mail.smtp.writetimeout", "60000");
+        Session session = Session.getInstance(
+                props,
+                new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
 
-        Session session = Session.getInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(myEmail, password);
-            }
-        });
-        try {
-// 1️⃣ Mail to YOU
-            java.net.InetAddress addr =
-                    java.net.InetAddress.getByName("smtp.gmail.com");
+                        return new PasswordAuthentication(
+                                myEmail,
+                                password
+                        );
+                    }
+                }
+        );
+        try{
+            Message message = new MimeMessage(session);
 
-            System.out.println("SMTP IP = " + addr.getHostAddress());
-
-            Message adminMsg = new MimeMessage(session);
-
-            adminMsg.setFrom(new InternetAddress(myEmail));
-            adminMsg.setRecipients(Message.RecipientType.TO,
-                    InternetAddress.parse(myEmail));
-
-            adminMsg.setReplyTo(new Address[]{
-                    new InternetAddress(to) // user's email
-            });
-
-            adminMsg.setSubject("Portfolio Contact: " + subject);
-
-            adminMsg.setText(
-                    "From: " + to + "\n\n" +
-                            text
+            message.setFrom(
+                new InternetAddress(userMail)
             );
 
-            Transport.send(adminMsg);
+            message.setRecipients(
+                Message.RecipientType.TO,
+                InternetAddress.parse(userMail)
+            );
 
+            message.setSubject("Contact: " + subject);
+
+            message.setText(
+                "From: " + to + "\n\n" +
+                        text);
+
+            Transport.send(message);
 
 // 2️⃣ AUTO REPLY TO USER
             Message userMsg = new MimeMessage(session);
 
-            userMsg.setFrom(new InternetAddress(myEmail));
+            userMsg.setFrom(new InternetAddress(userMail));
             userMsg.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(to));
 
