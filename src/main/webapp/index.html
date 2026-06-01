@@ -1484,7 +1484,7 @@ Content-Type: application/json
 
         window.addEventListener("load", async () => {
             try {
-                await fetch("https://network-projects-do46.onrender.com/health");
+                await fetch(API_URL+'health');
             } catch (e) {
                 console.log("Wake-up request failed");
             }

@@ -10,7 +10,8 @@ public class MailService {
     private final static String myEmail = System.getenv("MAIL"); // Replace with actual email
 
     public String sendMail(String to, String subject, String text) {
-
+        System.out.println("MAIL = " + myEmail);
+        System.out.println("PASSWORD exists = " + (password != null));
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
