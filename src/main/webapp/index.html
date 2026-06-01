@@ -1482,14 +1482,6 @@ Content-Type: application/json
 
     <script>
 
-        window.addEventListener("load", async () => {
-            try {
-                await fetch(API_URL+'health');
-            } catch (e) {
-                console.log("Wake-up request failed");
-            }
-        });
-
         const API_URL = "https://network-projects-do46.onrender.com/";
         /* Upload a file and Search */
         function uploadAndSearch(endpoint, prefix, ids) {
